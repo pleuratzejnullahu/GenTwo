@@ -2,27 +2,30 @@
   <div class="main-header bg-neutral-900 sticky top-0 z-50">
     <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <RouterLink to="/" class="flex items-center gap-2">
-        <span class="text-lg font-semibold tracking-wide">GenTwo</span>
+        <span class="text-lg font-semibold tracking-wide font-sans">GenTwo</span>
       </RouterLink>
 
       <!-- Desktop nav -->
       <ul class="hidden md:flex items-center gap-8 text-sm">
-        <li>
+        <li class="cursor-pointer">
           <RouterLink to="/service" class="text-sm text-neutral-200 hover:text-white transition">
             Service
           </RouterLink>
         </li>
-        <li>
+
+        <li class="cursor-pointer">
           <RouterLink to="/features" class="text-sm text-neutral-200 hover:text-white transition">
             Features
           </RouterLink>
         </li>
-        <li>
+
+        <li class="cursor-pointer">
           <RouterLink to="/resources" class="text-sm text-neutral-200 hover:text-white transition">
             Resources
           </RouterLink>
         </li>
-        <li>
+
+        <li class="cursor-pointer">
           <RouterLink to="/contacts" class="text-sm text-neutral-200 hover:text-white transition">
             Contacts
           </RouterLink>
@@ -30,12 +33,13 @@
       </ul>
 
       <div class="hidden md:flex items-center gap-4">
-        <RouterLink to="/login" class="text-sm text-neutral-200 hover:text-white transition">
+        <RouterLink to="/login" class="text-sm text-neutral-200 hover:text-white transition cursor-pointer">
           Login
         </RouterLink>
+
         <RouterLink
             to="/signup"
-            class="rounded-full border border-white/20 px-5 py-2 text-sm hover:border-white/60 transition"
+            class="rounded-full border border-white/20 px-5 py-2 text-sm hover:border-white/60 transition cursor-pointer"
         >
           Signup
         </RouterLink>
@@ -52,6 +56,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                 d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"/>
         </svg>
+
         <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
              viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -68,12 +73,15 @@
         <RouterLink to="/service" class="block text-neutral-200 hover:text-white text-sm">
           Service
         </RouterLink>
+
         <RouterLink to="/features" class="block text-neutral-200 hover:text-white text-sm">
           Features
         </RouterLink>
+
         <RouterLink to="/resources" class="block text-neutral-200 hover:text-white text-sm">
           Resources
         </RouterLink>
+
         <RouterLink to="/contacts" class="block text-neutral-200 hover:text-white text-sm">
           Contacts
         </RouterLink>
@@ -82,6 +90,7 @@
           <RouterLink to="/login" class="block text-neutral-200 hover:text-white text-sm">
             Login
           </RouterLink>
+
           <RouterLink
               to="/signup"
               class="rounded-full border border-white/20 px-4 py-2 text-sm hover:border-white/60 transition"

@@ -1,22 +1,25 @@
 <template>
-  <div class="min-h-screen bg-neutral-900 text-neutral-100">
-    <SiteHeader />
-
-    <div class="dynamic-content px-4 sm:px-6 lg:px-8">
-      <RouterView />
-    </div>
-  </div>
+  <component :is="layoutComponent">
+    <router-view />
+  </component>
 </template>
 
 <script>
-import SiteHeader from "./components/layout/SiteHeader.vue";
+import DefaultLayout from './components/layout/DefaultLayout.vue'
+
 export default {
-  components: {
-    SiteHeader: SiteHeader
+  name: 'App',
+  components: { DefaultLayout },
+  computed: {
+    layoutName() {
+      return (this.$route.meta && this.$route.meta.layout) || 'default'
+    },
+    layoutComponent() {
+      switch (this.layoutName) {
+        case 'default': return 'DefaultLayout'
+        default: return 'DefaultLayout'
+      }
+    }
   }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

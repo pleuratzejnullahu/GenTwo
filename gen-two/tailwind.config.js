@@ -12,6 +12,10 @@ export default {
                 lg: "1024px",
                 xl: "1280px",
             },
+            fontFamily: {
+                sans: ["DM Sans", "sans-serif"],
+                rubik: ["Rubik", "sans-serif"],
+            },
         },
     },
 };
