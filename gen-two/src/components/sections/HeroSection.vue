@@ -44,6 +44,8 @@
             </div>
           </dl>
         </div>
+
+        <AlphaCard />
       </div>
     </Container>
   </div>
@@ -52,9 +54,10 @@
 <script>
 import Container from '../ui/Container.vue'
 import BaseButton from '../ui/BaseButton.vue'
+import AlphaCard from './AlphaCard.vue'
 
 export default {
   name: 'HeroSection',
-  components: { Container, BaseButton }
+  components: { Container, BaseButton, AlphaCard }
 }
 </script>
