@@ -126,6 +126,7 @@
 <script>
 import ratesService from '../../services/ratesService'
 import AlphaCardSkeleton from '../sections/AlphaCardSkeleton.vue'
+import currencies from '../../assets/currencies/currencies.json'
 
 export default {
   name: 'RatesCard',
@@ -200,8 +201,7 @@ export default {
       this.dropdownOpen = false
     },
     flagFor(code) {
-      const map = { CHF:'🇨🇭', EUR:'🇪🇺', USD:'🇺🇸', GBP:'🇬🇧', JPY:'🇯🇵', AUD:'🇦🇺', CAD:'🇨🇦', SEK:'🇸🇪', NOK:'🇳🇴', CNY:'🇨🇳', TRY:'🇹🇷', INR:'🇮🇳', AED:'🇦🇪' }
-      return map[code] || '🏳️'
+      return currencies[code] || '🏳️'
     },
     goToPage(p){
       if(p>=1 && p<=this.totalPages) {

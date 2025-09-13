@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-[60vh] grid place-items-center">
+  <div class="not-found min-h-[60vh] grid place-items-center">
     <div class="text-center">
       <h1 class="text-5xl font-extrabold">404</h1>
       <p class="mt-3 text-neutral-400">Page not found.</p>
