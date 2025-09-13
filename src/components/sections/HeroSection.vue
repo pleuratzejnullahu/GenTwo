@@ -17,7 +17,10 @@
           <div class="mt-8 flex items-center gap-6">
             <BaseButton>Get it now</BaseButton>
 
-            <button class="text-neutral-300 hover:text-white underline-offset-4 hover:underline text-[18px] cursor-pointer">
+            <button
+                class="text-neutral-300 hover:text-white underline-offset-4 hover:underline text-[18px] cursor-pointer"
+                @click="$emit('scroll-how-it-works')"
+            >
               How it works?
             </button>
           </div>
@@ -27,25 +30,28 @@
               <span class="font-semibold text-[42px]" style="font-weight: 400">250+
                 <span class="text-[31px] text-[#B4B4B4]">M</span>
               </span>
-
-              <span class="text-neutral-400 text-sm">
-                Program Successful
-              </span>
+              <span class="text-neutral-400 text-sm">Program Successful</span>
             </div>
 
             <div class="flex flex-col">
               <span class="font-semibold text-[42px]" style="font-weight: 400">2.3
                 <span class="text-[31px] text-[#B4B4B4]">M</span>
               </span>
-
-              <span class="text-neutral-400 text-sm">
-                Satisfied User
-              </span>
+              <span class="text-neutral-400 text-sm">Satisfied User</span>
             </div>
           </dl>
         </div>
 
-        <AlphaCard />
+        <AlphaCard
+            :base="base"
+            :rates="rates"
+            :balance="balance"
+            :last-updated="lastUpdated"
+            :loading="loadingLatest"
+            :error="errorLatest"
+            @base-change="$emit('base-change', $event)"
+            @refresh-latest="$emit('refresh-latest')"
+        />
       </div>
     </Container>
   </div>
@@ -58,6 +64,17 @@ import AlphaCard from './AlphaCard.vue'
 
 export default {
   name: 'HeroSection',
-  components: { Container, BaseButton, AlphaCard }
+  components: { Container, BaseButton, AlphaCard },
+
+  props: {
+    base: { type: String, required: true },
+    rates: { type: Object, default: () => ({}) },
+    balance: { type: [Number, String], default: 0 },
+    lastUpdated: { type: [Date, Number, String], default: null },
+    loadingLatest: { type: Boolean, default: false },
+    errorLatest: { type: String, default: null }
+  },
+
+  emits: ['base-change', 'refresh-latest', 'scroll-how-it-works']
 }
 </script>

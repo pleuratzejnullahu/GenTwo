@@ -19,6 +19,7 @@
             </p>
           </div>
 
+          <!-- Base selector (emits base-change) -->
           <div class="relative" @keydown.escape="dropdownOpen=false">
             <button
                 class="flex items-center gap-2 rounded-md px-3 py-2 bg-neutral-700/60 border border-neutral-600 text-sm"
@@ -50,7 +51,7 @@
 
         <div class="mt-6">
           <p class="text-sm text-neutral-400 mb-3">Currency</p>
-          <ul class="space-y-3 min-h-[180px]"> <!-- 5 rows × ~36px each -->
+          <ul class="space-y-3 min-h-[180px]">
             <li
                 v-for="[code, value] in pagedPairs"
                 :key="`${base}-${code}`"
@@ -59,7 +60,7 @@
               <span>{{ base }} ⇄ {{ code }}</span>
               <span class="tabular-nums">{{ formatRate(value) }}</span>
             </li>
-
+            
             <li
                 v-for="n in (pageSize - pagedPairs.length)"
                 :key="`placeholder-${n}`"
@@ -106,10 +107,10 @@
       <div>
         <button
             :disabled="loading"
-            @click="onRefresh"
+            @click="$emit('refresh-latest')"
             class="mt-8 w-full cursor-pointer rounded-lg py-3 text-sm font-medium transition hover:opacity-90
-            border-1 border-transparent
-            [background:linear-gradient(#1F1F1F,#1F1F1F)_padding-box,linear-gradient(to_right,#43B37D,#B1E04B)_border-box]"
+                 border-1 border-transparent
+                 [background:linear-gradient(#1F1F1F,#1F1F1F)_padding-box,linear-gradient(to_right,#43B37D,#B1E04B)_border-box]"
         >
           <span class="block text-center text-transparent bg-clip-text bg-gradient-to-r from-[#43B37D] to-[#B1E04B]">
             {{ loading ? 'Refreshing…' : 'Refresh Rates' }}
@@ -124,99 +125,100 @@
 </template>
 
 <script>
-import ratesService from '../../services/ratesService'
 import AlphaCardSkeleton from '../sections/AlphaCardSkeleton.vue'
 import currencies from '../../assets/currencies/currencies.json'
 
 export default {
   name: 'RatesCard',
   components: { AlphaCardSkeleton },
+
+  props: {
+    base: { type: String, required: true },
+    rates: { type: Object, default: () => ({}) },
+    balance: { type: [Number, String], default: 0 },
+    lastUpdated: { type: [Date, Number, String], default: null },
+    loading: { type: Boolean, default: false },
+    error: { type: String, default: null },
+    baseOptions: { type: Array, default: () => ['CHF', 'EUR', 'USD', 'GBP', 'JPY'] },
+    allSymbols: {
+      type: Array,
+      default: () => ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED']
+    },
+    pageSize: { type: Number, default: 5 }
+  },
+
+  emits: ['base-change', 'refresh-latest'],
+
   data() {
     return {
-      base: 'CHF',
-      rates: {},
-      balance: '',
-      lastUpdated: new Date(),
-      loading: false,
-      error: null,
-      dropdownOpen: false,
-      baseOptions: ['CHF', 'EUR', 'USD', 'GBP', 'JPY'],
-      allSymbols: ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED'],
-      pageSize: 5,
-      currentPage: 1
+      currentPage: 1,
+      dropdownOpen: false
     }
   },
+
   computed: {
     formattedUpdated() {
-      const d = new Date(this.lastUpdated)
-      return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`
+      if (!this.lastUpdated) return '—'
+      let d = this.lastUpdated
+      if (typeof d === 'number') {
+        if (d < 2e12) d = d * 1000
+        d = new Date(d)
+      } else if (typeof d === 'string') {
+        d = new Date(d)
+      }
+      const dd = String(d.getDate()).padStart(2,'0')
+      const mm = String(d.getMonth()+1).padStart(2,'0')
+      const yyyy = d.getFullYear()
+      return `${dd}.${mm}.${yyyy}`
     },
+
     availableSymbols() {
       return this.allSymbols.filter(s => this.rates[s] != null)
     },
+
     totalPages() {
       return Math.max(1, Math.ceil(this.availableSymbols.length / this.pageSize))
     },
+
     pagedPairs() {
       const start = (this.currentPage - 1) * this.pageSize
       const pageSymbols = this.availableSymbols.slice(start, start + this.pageSize)
       return pageSymbols.map(code => [code, this.rates[code]])
     }
   },
-  created() {
-    this.onRefresh()
+
+  mounted() {
     if (typeof window !== 'undefined') {
       this._onClickAway = (e) => { if (!this.$el.contains(e.target)) this.dropdownOpen = false }
       window.addEventListener('click', this._onClickAway)
     }
   },
+
   beforeUnmount() {
     if (this._onClickAway) window.removeEventListener('click', this._onClickAway)
   },
+
   watch: {
-    base() {
-      this.currentPage = 1
-      this.onRefresh()
-    }
+    base() { this.currentPage = 1 },
+    rates() { if (this.currentPage > this.totalPages) this.currentPage = this.totalPages }
   },
+
   methods: {
-    async onRefresh() {
-      this.loading = true
-      this.error = null
-      try {
-        const params = { base: this.base, symbols: this.allSymbols }
-        const res = await ratesService.getRates(params)
-        this.base = res.base
-        this.rates = res.rates
-        this.balance = res.balance
-        this.lastUpdated = res.lastUpdated
-      } catch (e) {
-        this.error = 'Failed to refresh rates.'
-      } finally {
-        this.loading = false
-      }
-    },
     selectBase(code) {
-      this.base = code;
       this.dropdownOpen = false
+      if (code && code !== this.base) this.$emit('base-change', code)
     },
     flagFor(code) {
       return currencies[code] || '🏳️'
     },
-    goToPage(p){
-      if(p>=1 && p<=this.totalPages) {
-        this.currentPage = p
-      }
+    goToPage(p) {
+      if (p >= 1 && p <= this.totalPages) this.currentPage = p
     },
-    nextPage(){
-      if(this.currentPage < this.totalPages) {
-        this.currentPage++
-      }
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++
     },
-    prevPage(){
-      if(this.currentPage > 1) {
-        this.currentPage--
-      }
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--
     },
     formatRate(v) {
       if (v == null || isNaN(v)) return '—'
@@ -247,7 +249,6 @@ export default {
   font-weight: 600;
   font-size: 1rem;
 }
-
 .pagination .num.active {
   background: rgba(38,38,38,.95);
   border: 1px solid rgba(148,163,184,.35);
