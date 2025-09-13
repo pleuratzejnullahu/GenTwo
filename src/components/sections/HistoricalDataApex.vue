@@ -1,5 +1,5 @@
 <template>
-  <section class="mt-16 mb-10">
+  <section class="mt-16 mb-5">
     <Container>
       <div class="w-full rounded-2xl border border-neutral-700 bg-neutral-800/40 p-6">
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -8,26 +8,51 @@
             <h3 class="text-lg font-semibold">Historical Data</h3>
           </div>
 
-          <div class="flex flex-wrap items-center gap-2">
-            <!-- timeframe (emit up) -->
-            <div class="inline-flex rounded-md border border-neutral-700 overflow-hidden">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="segmented">
               <button
                   v-for="opt in tfOpts"
                   :key="opt.value"
-                  class="px-3 py-1.5 text-sm"
-                  :class="timeFrame === opt.value ? 'bg-neutral-700 font-medium' : 'bg-transparent text-neutral-300'"
+                  class="segmented-btn"
+                  :class="timeFrame === opt.value ? 'is-active' : ''"
                   @click="$emit('timeframe-change', opt.value)"
-              >{{ opt.label }}</button>
+              >
+                {{ opt.label }}
+              </button>
             </div>
 
-            <!-- view toggle (local-only) -->
-            <div class="inline-flex rounded-md border border-neutral-700 overflow-hidden">
-              <button class="px-3 py-1.5 text-sm"
-                      :class="view==='chart' ? 'bg-neutral-700 font-medium' : 'text-neutral-300'"
-                      @click="view='chart'">📈 Chart</button>
-              <button class="px-3 py-1.5 text-sm"
-                      :class="view==='table' ? 'bg-neutral-700 font-medium' : 'text-neutral-300'"
-                      @click="view='table'">📋 Table</button>
+            <div class="icon-toggle">
+              <button
+                  class="icon-btn"
+                  :class="view === 'chart' ? 'is-active' : ''"
+                  @click="view='chart'"
+                  title="Chart"
+                  aria-label="Chart view"
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                  <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+              </button>
+
+              <button
+                  class="icon-btn"
+                  :class="view === 'table' ? 'is-active' : ''"
+                  @click="view='table'"
+                  title="Table"
+                  aria-label="Table view"
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <rect x="3" y="4" width="3" height="3" rx="0.75"></rect>
+                  <rect x="3" y="10.5" width="3" height="3" rx="0.75"></rect>
+                  <rect x="3" y="17" width="3" height="3" rx="0.75"></rect>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -79,8 +104,8 @@ export default {
   props: {
     base: { type: String, required: true },
     symbol: { type: String, required: true },
-    timeFrame: { type: String, required: true }, // 'weekly' | 'monthly' | 'yearly'
-    series: { type: Array, required: true },     // [{date, value}]
+    timeFrame: { type: String, required: true },
+    series: { type: Array, required: true },
     loading: { type: Boolean, default: false },
     error: { type: String, default: null }
   },
@@ -98,10 +123,27 @@ export default {
     chartSeries() {
       return [{ name: `${this.base}→${this.symbol}`, data: this.series.map(p => p.value) }]
     },
+    yBounds() {
+      const vals = this.series.map(p => p.value)
+      if (!vals.length) return { min: undefined, max: undefined }
+      const min = Math.min(...vals)
+      const max = Math.max(...vals)
+      const pad = Math.max((max - min) * 0.15, 0.0002)
+      return { min: +(min - pad).toFixed(6), max: +(max + pad).toFixed(6) }
+    },
     chartOptions() {
       return {
         chart: { toolbar: { show: false }, animations: { enabled: true } },
         stroke: { width: 2, curve: 'smooth' },
+
+        markers: {
+          size: 5,
+          strokeWidth: 3,
+          strokeColors: '#7FE055',
+          colors: ['#0F0F0F'],
+          hover: { size: 7, sizeOffset: 2 }
+        },
+
         grid: { borderColor: 'rgba(148,163,184,.2)' },
         xaxis: {
           categories: this.series.map(p => this.xLabel(p.date)),
@@ -118,11 +160,11 @@ export default {
       }
     },
     tableRows() {
-      const asc = this.series || [] // already oldest→newest
+      const asc = this.series || []
       return asc.map(p => ({
         k: +new Date(p.date),
-        label: this.xLabel(p.date),          // SAME as chart x-axis
-        full:  this.tooltipDate(p.date),     // full date for hover
+        label: this.xLabel(p.date),
+        full:  this.tooltipDate(p.date),
         value: Number(p.value).toFixed(4)
       }))
     }
@@ -131,25 +173,68 @@ export default {
     labelFor(tf) { return this.tfOpts.find(t => t.value === tf)?.label ?? tf },
     xLabel(d) {
       const dt = dayjs(d)
-      if (this.timeFrame === 'yearly') {
-        return dt.format('MMM YYYY')
-      }
-      if (this.timeFrame === 'monthly') {
-        return dt.format('DD.MM')
-      }
+      if (this.timeFrame === 'yearly')  return dt.format('MMM YYYY')
+      if (this.timeFrame === 'monthly') return dt.format('DD.MM')
       return dt.format('D MMM')
     },
     tooltipDate(d) {
       const dt = dayjs(d)
-      if (this.timeFrame === 'yearly') {
-        return dt.format('MMM YYYY')
-      }
-      return dt.format('DD.MM.YYYY')
-    },
+      return this.timeFrame === 'yearly'
+          ? dt.format('MMM YYYY')
+          : dt.format('DD.MM.YYYY')
+    }
   }
 }
 </script>
 
+
 <style scoped>
 .tabular-nums { font-variant-numeric: tabular-nums; }
+
+.segmented {
+  display: inline-flex;
+  gap: .25rem;
+  padding: .25rem;
+  border-radius: .75rem;
+  background: rgba(82,82,82,.25);
+  border: 1px solid rgba(148,163,184,.35);
+}
+.segmented-btn {
+  padding: .5rem 1.25rem;
+  border-radius: .5rem;
+  font-size: .95rem;
+  color: #D4D4D4;
+  transition: all .15s ease;
+}
+.segmented-btn:hover { color: #fff; }
+.segmented-btn.is-active {
+  color: #0b0f0b;
+  font-weight: 700;
+  background: linear-gradient(90deg, #43B37D, #B1E04B);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
+}
+
+.icon-toggle {
+  display: inline-flex;
+  gap: .5rem;
+  padding: .35rem;
+  border-radius: .75rem;
+  background: rgba(82,82,82,.25);
+  border: 1px solid rgba(148,163,184,.35);
+}
+.icon-btn {
+  width: 40px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: .5rem;
+  color: #d4d4d4;
+  transition: all .15s ease;
+}
+.icon-btn:hover { color: #fff; }
+.icon-btn.is-active {
+  color: #7FE055;
+  background: rgba(38,38,38,.75);
+  box-shadow: inset 0 0 0 1px rgba(127,224,85,.3);
+}
 </style>

@@ -1,5 +1,43 @@
-# Vue 3 + Vite
+# GenTwo
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+GenTwo is a Vue 3 + Vite application that visualizes **historical currency exchange data** with interactive charts (ApexCharts).  
+It features modular Vue components, API-driven services, and a complete test suite with **Vitest**.
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+---
+
+## 📦 Requirements
+
+- **Node.js v20 or higher**
+- **npm v9+** (comes bundled with Node 20+)
+
+---
+
+## 📦 Setup
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+## 🚀 Development
+
+Run the local dev server with hot reload:
+
+```bash
+npm run dev
+```
+
+## 🧪 Testing
+
+Run all tests:
+
+```bash
+npm run test
+```
+
+Run tests with coverage:
+
+```bash
+npm run coverage
+```

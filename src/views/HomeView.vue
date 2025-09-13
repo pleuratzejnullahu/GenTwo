@@ -8,7 +8,7 @@
         :loading-latest="loadingLatest"
         :error-latest="errorLatest"
         @base-change="onBaseChange"
-        @refresh-latest="fetchLatest"
+        @refresh-latest="fetchAll"
         @scroll-how-it-works="scrollToHowItWorks"
     />
 
@@ -27,11 +27,12 @@
 </template>
 
 <script>
+import ratesService from '@/services/ratesService'
+import { getHistoricalSeries } from '@/services/historicalService'
+
 import HeroSection from '@/components/sections/HeroSection.vue'
 import HowItWorksSection from '@/components/sections/HowItWorksSection.vue'
 import HistoricalDataApex from '@/components/sections/HistoricalDataApex.vue'
-import ratesService from '@/services/ratesService'
-import { getHistoricalSeries } from '@/services/historicalService'
 
 export default {
   name: 'HomeView',
@@ -39,12 +40,12 @@ export default {
 
   data() {
     return {
+      rates: {},
       base: 'CHF',
       symbol: 'EUR',
-      timeFrame: 'weekly',
-      rates: {},
       balance: null,
       lastUpdated: null,
+      timeFrame: 'weekly',
       historicalSeries: [],
       loadingLatest: false,
       loadingHistorical: false,
@@ -53,73 +54,69 @@ export default {
     }
   },
 
-  created() {
-    this.fetchLatest()
-    this.fetchHistorical()
+  mounted() {
+    this.fetchAll()
   },
 
   methods: {
-    async fetchLatest() {
+    async fetchAll() {
       this.loadingLatest = true
+      this.loadingHistorical = true
       this.errorLatest = null
+      this.errorHistorical = null
+
       try {
-        const res = await ratesService.getRates({
-          base: this.base,
-          symbols: ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED']
-        })
-        this.rates = res.rates
-        this.balance = res.balance
-        this.lastUpdated = res.lastUpdated
+        const [latestRes, historicalRes] = await Promise.all([
+          ratesService.getRates({
+            base: this.base,
+            symbols: ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED']
+          }),
+          getHistoricalSeries({
+            base: this.base,
+            symbol: this.symbol,
+            timeFrame: this.timeFrame
+          })
+        ])
+
+        this.rates = latestRes.rates
+        this.balance = latestRes.balance
+        this.lastUpdated = latestRes.lastUpdated
+
+        this.historicalSeries = historicalRes
       } catch (e) {
         console.error(e)
-        this.errorLatest = 'Failed to refresh rates.'
+        const url = e?.response?.config?.url || ''
+        if (url.includes('/historical/')) {
+          this.errorHistorical = 'Failed to load historical data.'
+          this.historicalSeries = []
+        } else {
+          this.errorLatest = 'Failed to refresh rates.'
+        }
       } finally {
-        this.loadingLatest = false
+        setTimeout(() => {
+          this.loadingLatest = false
+          this.loadingHistorical = false
+        }, 2000)
       }
     },
 
-    async fetchHistorical() {
-      this.loadingHistorical = true
-      this.errorHistorical = null
-      try {
-        this.historicalSeries = await getHistoricalSeries({
-          base: this.base,
-          symbol: this.symbol,
-          timeFrame: this.timeFrame
-        })
-      } catch (e) {
-        console.error(e)
-        this.errorHistorical = 'Failed to load historical data.'
-        this.historicalSeries = []
-      } finally {
-        this.loadingHistorical = false
-      }
-    },
-    onBaseChange(newBase) {
+    async onBaseChange(newBase) {
       if (newBase && newBase !== this.base) {
         this.base = newBase
-        this.fetchLatest()
-        this.fetchHistorical()
+        await this.fetchAll()
       }
     },
-    onSymbolChange(newSymbol) {
-      if (newSymbol && newSymbol !== this.symbol) {
-        this.symbol = newSymbol
-        this.fetchLatest()
-        this.fetchHistorical()
-      }
-    },
-    onTimeFrameChange(tf) {
+
+    async onTimeFrameChange(tf) {
       if (tf && tf !== this.timeFrame) {
         this.timeFrame = tf
-        this.fetchHistorical()
+        await this.fetchAll()
       }
     },
+
     scrollToHowItWorks() {
       const el = document.getElementById('how-it-works')
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' })
-      }
+      if (el) el.scrollIntoView({ behavior: 'smooth' })
     }
   }
 }

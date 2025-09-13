@@ -60,7 +60,7 @@
               <span>{{ base }} ⇄ {{ code }}</span>
               <span class="tabular-nums">{{ formatRate(value) }}</span>
             </li>
-            
+
             <li
                 v-for="n in (pageSize - pagedPairs.length)"
                 :key="`placeholder-${n}`"
