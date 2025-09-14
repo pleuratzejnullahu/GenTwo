@@ -3,25 +3,23 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <nav class="h-16 flex items-center justify-between border-b border-white/10">
         <RouterLink to="/" class="flex items-center gap-2">
-          <span class="text-lg font-semibold tracking-wide font-sans">GenTwo</span>
+          <span class="font-semibold tracking-wide font-sans text-[24px]">GenTwo</span>
         </RouterLink>
 
-        <!-- Desktop nav -->
         <ul class="hidden md:flex items-center gap-8 text-sm">
-          <li><RouterLink to="/service" class="text-sm text-neutral-200 hover:text-white transition">Service</RouterLink></li>
-          <li><RouterLink to="/features" class="text-sm text-neutral-200 hover:text-white transition">Features</RouterLink></li>
-          <li><RouterLink to="/resources" class="text-sm text-neutral-200 hover:text-white transition">Resources</RouterLink></li>
-          <li><RouterLink to="/contacts" class="text-sm text-neutral-200 hover:text-white transition">Contacts</RouterLink></li>
+          <li><RouterLink to="/service" class="text-neutral-200 hover:text-white transition text-[16px]">Service</RouterLink></li>
+          <li><RouterLink to="/features" class="text-neutral-200 hover:text-white transition text-[16px]">Features</RouterLink></li>
+          <li><RouterLink to="/resources" class="text-neutral-200 hover:text-white transition text-[16px]">Resources</RouterLink></li>
+          <li><RouterLink to="/contacts" class="text-neutral-200 hover:text-white transition text-[16px]">Contacts</RouterLink></li>
         </ul>
 
         <div class="hidden md:flex items-center gap-4">
-          <RouterLink to="/login" class="text-sm text-neutral-200 hover:text-white transition">Login</RouterLink>
-          <RouterLink to="/signup" class="rounded-full border border-white/20 px-5 py-2 text-sm hover:border-white/60 transition">
+          <RouterLink to="/login" class="text-neutral-200 hover:text-white transition text-[16px]">Login</RouterLink>
+          <RouterLink to="/signup" class="rounded-full border border-white/20 px-5 py-2 hover:border-white/60 transition text-[16px]">
             Signup
           </RouterLink>
         </div>
 
-        <!-- Mobile menu button -->
         <button
             class="md:hidden inline-flex items-center justify-center rounded-md p-2 hover:bg-white/5 focus:outline-none"
             @click="toggleMenu"
@@ -41,7 +39,6 @@
       </nav>
     </div>
 
-    <!-- Mobile dropdown -->
     <div v-if="open" class="md:hidden bg-neutral-900 px-4 sm:px-6 lg:px-8">
       <div class="py-3 space-y-2">
         <RouterLink to="/service" class="block text-neutral-200 hover:text-white text-sm">Service</RouterLink>

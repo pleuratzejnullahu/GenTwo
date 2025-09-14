@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default {
     getRates(params) {
-        const appId = "f53561faf19f41e5a8a2b9c5ddfe7700";
+        const appId = "9613fc840fc148c890e756961ca33869";
         const url = "https://openexchangerates.org/api/latest.json";
 
         const needed = Array.from(new Set([...params.symbols, params.base]));

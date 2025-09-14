@@ -9,21 +9,22 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="inline-block h-2.5 w-2.5 rounded-full bg-emerald-400 shadow"></span>
-          <span class="font-semibold">AlphaCard</span>
+          <span class="font-semibold text-[18px] rubik">AlphaCard</span>
         </div>
 
-        <div class="mt-6 flex items-start justify-between gap-3">
+        <div class="mt-6">
           <div>
-            <p class="text-neutral-400 text-sm">Amount balance</p>
-            <p class="text-3xl sm:text-4xl font-extrabold mt-2">
-              {{ Number(balance).toLocaleString() }} {{ base }}
-            </p>
+            <p class="text-neutral-400 text-sm rubik">Amount balance</p>
           </div>
 
-          <div class="relative" @keydown.escape="dropdownOpen=false">
+          <div class="relative flex items-center justify-between gap-10 mt-[16px]" @keydown.escape="dropdownOpen=false">
+            <p class="text-3xl sm:text-4xl font-bold rubik">
+              {{ Number(balance).toLocaleString() }} {{ base }}
+            </p>
+
             <button
                 data-testid="base-button"
-                class="flex items-center gap-2 rounded-md px-3 py-2 bg-neutral-700/60 border border-neutral-600 text-sm"
+                class="flex items-center gap-2 rounded-md px-3 py-2 bg-neutral-700/60 border border-neutral-600 text-sm cursor-pointer"
                 @click="dropdownOpen = !dropdownOpen"
             >
               <span class="text-lg leading-none">{{ flagFor(base) }}</span>
@@ -52,8 +53,8 @@
         </div>
 
         <div class="mt-6">
-          <p class="text-sm text-neutral-400 mb-3">Currency</p>
-          <ul class="space-y-3 min-h-[180px]">
+          <p class="text-sm text-neutral-400 mb-3 rubik">Currency</p>
+          <ul class="space-y-3 min-h-[180px] rubik">
             <li
                 v-for="[code, value] in pagedPairs"
                 :key="`${base}-${code}`"
@@ -61,14 +62,6 @@
             >
               <span>{{ base }} ⇄ {{ code }}</span>
               <span class="tabular-nums">{{ formatRate(value) }}</span>
-            </li>
-
-            <li
-                v-for="n in (pageSize - pagedPairs.length)"
-                :key="`placeholder-${n}`"
-                class="flex items-center justify-between opacity-0 select-none"
-            >
-              <span>placeholder</span><span>0.00</span>
             </li>
           </ul>
 
@@ -114,12 +107,12 @@
                  border-1 border-transparent
                  [background:linear-gradient(#1F1F1F,#1F1F1F)_padding-box,linear-gradient(to_right,#43B37D,#B1E04B)_border-box]"
         >
-          <span class="block text-center text-transparent bg-clip-text bg-gradient-to-r from-[#43B37D] to-[#B1E04B]">
+          <span class="block text-center text-transparent bg-clip-text bg-gradient-to-r from-[#43B37D] to-[#B1E04B] rubik">
             {{ loading ? 'Refreshing…' : 'Refresh Rates' }}
           </span>
         </button>
 
-        <p class="text-xs text-neutral-500 mt-4">Last updated: {{ formattedUpdated }}</p>
+        <p class="text-neutral-500 mt-4 rubik text-[14px]">Last updated: {{ formattedUpdated }}</p>
         <p v-if="error" class="text-sm mt-3 text-red-400">{{ error }}</p>
       </div>
     </div>
@@ -127,7 +120,7 @@
 </template>
 
 <script>
-import AlphaCardSkeleton from '../sections/AlphaCardSkeleton.vue'
+import AlphaCardSkeleton from './skeletons/AlphaCardSkeleton.vue'
 import currencies from '../../assets/currencies/currencies.json'
 
 export default {

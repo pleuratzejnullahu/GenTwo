@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+body {
+    font-family: 'DM Sans', sans-serif;
+}
+
+.rubik {
+    font-family: 'Rubik', sans-serif;
+}
+
+.font-600{
+    font-weight: 600;
+}

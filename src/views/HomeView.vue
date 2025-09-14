@@ -65,39 +65,41 @@ export default {
       this.errorLatest = null
       this.errorHistorical = null
 
-      try {
-        const [latestRes, historicalRes] = await Promise.all([
-          ratesService.getRates({
-            base: this.base,
-            symbols: ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED']
-          }),
-          getHistoricalSeries({
-            base: this.base,
-            symbol: this.symbol,
-            timeFrame: this.timeFrame
-          })
-        ])
+      const latestP = ratesService.getRates({
+        base: this.base,
+        symbols: ['EUR','USD','JPY','GBP','AUD','CAD','SEK','NOK','CNY','TRY','INR','AED']
+      })
 
-        this.rates = latestRes.rates
-        this.balance = latestRes.balance
-        this.lastUpdated = latestRes.lastUpdated
+      const historicalP = getHistoricalSeries({
+        base: this.base,
+        symbol: this.symbol,
+        timeFrame: this.timeFrame
+      })
 
-        this.historicalSeries = historicalRes
-      } catch (e) {
-        console.error(e)
-        const url = e?.response?.config?.url || ''
-        if (url.includes('/historical/')) {
-          this.errorHistorical = 'Failed to load historical data.'
-          this.historicalSeries = []
-        } else {
-          this.errorLatest = 'Failed to refresh rates.'
-        }
-      } finally {
-        setTimeout(() => {
-          this.loadingLatest = false
-          this.loadingHistorical = false
-        }, 2000)
+      const [latest, historical] = await Promise.allSettled([latestP, historicalP])
+
+      if (latest.status === 'fulfilled') {
+        const r = latest.value
+        this.rates = r.rates
+        this.balance = r.balance
+        this.lastUpdated = r.lastUpdated
+      } else {
+        console.error('latest failed:', latest.reason)
+        this.errorLatest = 'Failed to refresh rates.'
       }
+
+      if (historical.status === 'fulfilled') {
+        this.historicalSeries = historical.value
+      } else {
+        console.error('historical failed:', historical.reason)
+        this.errorHistorical = 'Failed to load historical data.'
+        this.historicalSeries = []
+      }
+
+      setTimeout(() => {
+        this.loadingLatest = false
+        this.loadingHistorical = false
+      }, 200)
     },
 
     async onBaseChange(newBase) {
