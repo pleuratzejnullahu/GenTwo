@@ -132,6 +132,14 @@ export default {
     chartSeries() {
       return [{name: `${this.base}→${this.symbol}`, data: this.series.map(p => p.value)}]
     },
+    yBounds() {
+      const vals = this.series.map(p => p.value)
+      if (!vals.length) return { min: undefined, max: undefined }
+      const min = Math.min(...vals)
+      const max = Math.max(...vals)
+      const pad = Math.max((max - min) * 0.15, 0.0002)
+      return { min: +(min - pad).toFixed(6), max: +(max + pad).toFixed(6) }
+    },
     chartOptions() {
       return {
         chart: {
