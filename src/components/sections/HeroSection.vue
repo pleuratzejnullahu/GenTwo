@@ -3,12 +3,12 @@
     <Container>
       <div class="grid lg:grid-cols-2 gap-10 items-center">
         <div>
-          <span class="font-extrabold leading-tight text-[72px]">
+          <h1 data-testid="hero-title" class="font-extrabold leading-tight text-[72px]">
             Build your own financial
             <span class="bg-gradient-to-r from-[#43B37D] to-[#B1E04B] bg-clip-text text-transparent">
               plan.
             </span>
-          </span>
+          </h1>
 
           <p class="mt-5 text-neutral-400 max-w-xl text-[18px]">
             With our new program, we help you create your financial plan to make a better life in the future.

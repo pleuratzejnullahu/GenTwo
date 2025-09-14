@@ -10,7 +10,8 @@
     "test": "vitest --coverage",
     "test:watch": "vitest",
     "lint": "eslint . --ext .js,.vue",
-    "lint:fix": "eslint . --ext .js,.vue --fix"
+    "lint:fix": "eslint . --ext .js,.vue --fix",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@tailwindcss/postcss": "4.0.7",
@@ -23,6 +24,7 @@
     "vue3-apexcharts": "^1.8.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/vite": "^4.1.13",
     "@testing-library/dom": "^10.4.1",
     "@vitejs/plugin-vue": "^6.0.1",

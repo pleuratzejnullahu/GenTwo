@@ -1,5 +1,6 @@
 <template>
   <div
+      data-testid="alpha-card"
       class="bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 relative flex flex-col justify-between"
   >
     <AlphaCardSkeleton v-if="loading" />
@@ -19,9 +20,9 @@
             </p>
           </div>
 
-          <!-- Base selector (emits base-change) -->
           <div class="relative" @keydown.escape="dropdownOpen=false">
             <button
+                data-testid="base-button"
                 class="flex items-center gap-2 rounded-md px-3 py-2 bg-neutral-700/60 border border-neutral-600 text-sm"
                 @click="dropdownOpen = !dropdownOpen"
             >
@@ -34,6 +35,7 @@
 
             <ul
                 v-if="dropdownOpen"
+                data-testid="base-menu"
                 class="absolute right-0 mt-2 w-36 rounded-md border border-neutral-700 bg-neutral-800 shadow-lg z-10 overflow-hidden"
             >
               <li
