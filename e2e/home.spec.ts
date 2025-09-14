@@ -44,7 +44,7 @@ test.describe('Home (GenTwo)', () => {
 
         const menu = page.getByTestId('base-menu')
         await expect(menu).toBeVisible()
-        
+
         await menu.getByText('EUR', { exact: true }).click()
         await expect(baseButton).toContainText('EUR')
     })
